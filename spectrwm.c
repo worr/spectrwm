@@ -11445,12 +11445,25 @@ main(int argc, char *argv[])
 	struct passwd		*pwd;
 	struct swm_region	*r;
 	xcb_generic_event_t	*evt;
-	int			xfd, i, num_screens, num_readable;
+	int			xfd, i, num_screens, num_readable, c;
 	char			conf[PATH_MAX], *cfile = NULL;
 	bool			stdin_ready = false, startup = true;
 
-	/* suppress unused warning since var is needed */
-	(void)argc;
+	/* override config file with -f */
+	while ((c = getopt(argc, argv, "f:")) != -1) {
+		switch (c) {
+		case 'f':
+			if (strlen(optarg) && stat(optarg, &sb) != -1) {
+				if (S_ISREG(sb.st_mode)) {
+					cfile = conf;
+				}
+			} else {
+				fprintf(stderr, "invalid config file: %s\n",
+				    optarg);
+				exit(1);
+			}
+		}
+	}
 
 #ifdef SWM_DEBUG
 	time_started = time(NULL);
@@ -11518,39 +11531,41 @@ main(int argc, char *argv[])
 	setup_quirks();
 	setup_spawn();
 
-	/* load config */
-	for (i = 0; ; i++) {
-		conf[0] = '\0';
-		switch (i) {
-		case 0:
-			/* ~ */
-			snprintf(conf, sizeof conf, "%s/.%s",
-			    pwd->pw_dir, SWM_CONF_FILE);
-			break;
-		case 1:
-			/* global */
-			snprintf(conf, sizeof conf, "/etc/%s",
-			    SWM_CONF_FILE);
-			break;
-		case 2:
-			/* ~ compat */
-			snprintf(conf, sizeof conf, "%s/.%s",
-			    pwd->pw_dir, SWM_CONF_FILE_OLD);
-			break;
-		case 3:
-			/* global compat */
-			snprintf(conf, sizeof conf, "/etc/%s",
-			    SWM_CONF_FILE_OLD);
-			break;
-		default:
-			goto noconfig;
-		}
-
-		if (strlen(conf) && stat(conf, &sb) != -1)
-			if (S_ISREG(sb.st_mode)) {
-				cfile = conf;
+	if (cfile == NULL) {
+		/* load config */
+		for (i = 0; ; i++) {
+			conf[0] = '\0';
+			switch (i) {
+			case 0:
+				/* ~ */
+				snprintf(conf, sizeof conf, "%s/.%s",
+				    pwd->pw_dir, SWM_CONF_FILE);
 				break;
+			case 1:
+				/* global */
+				snprintf(conf, sizeof conf, "/etc/%s",
+				    SWM_CONF_FILE);
+				break;
+			case 2:
+				/* ~ compat */
+				snprintf(conf, sizeof conf, "%s/.%s",
+				    pwd->pw_dir, SWM_CONF_FILE_OLD);
+				break;
+			case 3:
+				/* global compat */
+				snprintf(conf, sizeof conf, "/etc/%s",
+				    SWM_CONF_FILE_OLD);
+				break;
+			default:
+				goto noconfig;
 			}
+
+			if (strlen(conf) && stat(conf, &sb) != -1)
+				if (S_ISREG(sb.st_mode)) {
+					cfile = conf;
+					break;
+				}
+		}
 	}
 noconfig:
 
