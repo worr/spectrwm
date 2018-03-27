@@ -3337,9 +3337,9 @@ lower_window(struct ws_win *win)
 		DPRINTF("=== stacking order (top down) === \n");
 		TAILQ_FOREACH(target, &ws->stack, stack_entry) {
 			DPRINTF("win %#x, fs: %s, maximized: %s, above: %s, "
-			    "iconic: %s\n", target->id, YESNO(FULLSCREEN(target)),
-			    YESNO(MAXIMIZED(target)), YESNO(ABOVE(target)),
-			    YESNO(ICONIC(target)));
+			    "iconic: %s\n", target->id,
+			    YESNO(FULLSCREEN(target)), YESNO(MAXIMIZED(target)),
+			    YESNO(ABOVE(target)), YESNO(ICONIC(target)));
 		}
 	}
 #endif
@@ -3395,9 +3395,9 @@ raise_window(struct ws_win *win)
 		DPRINTF("=== stacking order (top down) === \n");
 		TAILQ_FOREACH(target, &ws->stack, stack_entry) {
 			DPRINTF("win %#x, fs: %s, maximized: %s, above: %s, "
-			    "iconic: %s\n", target->id, YESNO(FULLSCREEN(target)),
-			    YESNO(MAXIMIZED(target)), YESNO(ABOVE(target)),
-			    YESNO(ICONIC(target)));
+			    "iconic: %s\n", target->id,
+			    YESNO(FULLSCREEN(target)), YESNO(MAXIMIZED(target)),
+			    YESNO(ABOVE(target)), YESNO(ICONIC(target)));
 		}
 	}
 #endif
@@ -5426,7 +5426,8 @@ vertical_config(struct workspace *ws, int id)
 			ws->l_state.vertical_mwin--;
 		break;
 	case SWM_ARG_ID_STACKBALANCE:
-		ws->l_state.vertical_msize = SWM_V_SLICE / (ws->l_state.vertical_stacks + 1);
+		ws->l_state.vertical_msize = SWM_V_SLICE /
+		    (ws->l_state.vertical_stacks + 1);
 		break;
 	case SWM_ARG_ID_STACKINC:
 		ws->l_state.vertical_stacks++;
@@ -5479,7 +5480,8 @@ horizontal_config(struct workspace *ws, int id)
 			ws->l_state.horizontal_mwin--;
 		break;
 	case SWM_ARG_ID_STACKBALANCE:
-		ws->l_state.horizontal_msize = SWM_H_SLICE / (ws->l_state.horizontal_stacks + 1);
+		ws->l_state.horizontal_msize = SWM_H_SLICE /
+		    (ws->l_state.horizontal_stacks + 1);
 		break;
 	case SWM_ARG_ID_STACKINC:
 		ws->l_state.horizontal_stacks++;
@@ -5561,7 +5563,8 @@ max_stack(struct workspace *ws, struct swm_geometry *g)
 		    HEIGHT(w) != gg.h) {
 			w->g = gg;
 
-			if (disable_border && !(bar_enabled && ws->bar_enabled)) {
+			if (disable_border &&
+			    !(bar_enabled && ws->bar_enabled)) {
 				w->bordered = false;
 				WIDTH(w) += 2 * border_width;
 				HEIGHT(w) += 2 * border_width;
@@ -10040,7 +10043,8 @@ manage_window(xcb_window_t id, int spawn_pos, bool mapping)
 	/* Set the _NET_WM_DESKTOP atom. */
 	DNPRINTF(SWM_D_PROP, "set _NET_WM_DESKTOP: %d\n", win->ws->idx);
 	xcb_change_property(conn, XCB_PROP_MODE_REPLACE, win->id,
-	    ewmh[_NET_WM_DESKTOP].atom, XCB_ATOM_CARDINAL, 32, 1, &win->ws->idx);
+	    ewmh[_NET_WM_DESKTOP].atom, XCB_ATOM_CARDINAL, 32, 1,
+	    &win->ws->idx);
 
 	/* Remove any _SWM_WS now that we set _NET_WM_DESKTOP. */
 	xcb_delete_property(conn, win->id, a_swm_ws);
@@ -10908,8 +10912,8 @@ leavenotify(xcb_leave_notify_event_t *e)
 {
 	last_event_time = e->time;
 
-	DNPRINTF(SWM_D_FOCUS, "time: %#x, win (x,y): %#x (%d,%d), mode: %s(%d), "
-	    "detail: %s(%d), root (x,y): %#x (%d,%d), child: %#x, "
+	DNPRINTF(SWM_D_FOCUS, "time: %#x, win (x,y): %#x (%d,%d), mode: %s(%d),"
+	    " detail: %s(%d), root (x,y): %#x (%d,%d), child: %#x, "
 	    "same_screen_focus: %s, state: %s(%d)\n", e->time, e->event,
 	    e->event_x, e->event_y, get_notify_mode_label(e->mode), e->mode,
 	    get_notify_detail_label(e->detail), e->detail, e->root, e->root_x,
